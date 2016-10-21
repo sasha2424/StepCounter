@@ -5,25 +5,18 @@ import org.math.plot.Plot2DPanel;
 
 public class BasicPlotting {
 	public static void main(String[] args) {
-		int size = 100;
-		
-		double[] sample1 = new double[size];
-		double[] sample2 = new double[size];
-		
-		for (int i = 0; i < size; i++) {
-			sample2[i] = i;
-			sample1[i] = 10;
-		}
-		
-		addNoise(sample1, 5);
-		addNoise(sample2, 50);
-		
+		String names = "xa,ya,za,xr,yr,zr";
+		String[] columnNames = names.split(",");
+
+		CSVData data = CSVData.readCSVFile("C://Users//sasha//Desktop//HIMU.txt", columnNames, 2, "#");
+
 		Plot2DPanel plot = new Plot2DPanel();
-		
+
 		// add a line plot to the PlotPanel
-		plot.addLinePlot("Random signal", sample1);
-		plot.addLinePlot("y = x + noise", sample2);
-		
+		for (int i = 0; i < 3; i++) {
+			plot.addLinePlot("X acceleration", data.getColumn(i));
+		}
+
 		// put the PlotPanel in a JFrame, as a JPanel
 		JFrame frame = new JFrame("Results");
 		frame.setSize(800, 600);
@@ -33,7 +26,7 @@ public class BasicPlotting {
 
 	private static void addNoise(double[] sample, int max) {
 		for (int i = 0; i < sample.length; i++) {
-			sample[i] += (-max + Math.random()*2*max);
+			sample[i] += (-max + Math.random() * 2 * max);
 		}
 	}
 }

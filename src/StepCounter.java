@@ -1,8 +1,13 @@
+/***
+ * Frank and Sasha
+ */
+
+
 import java.util.ArrayList;
 
 public class StepCounter {
 
-	private static int countSteps(double[] times, double[][] sensorData) {
+	public static int countSteps(double[] times, double[][] sensorData) {
 		double[] mags = calculateMagnitudesFor(sensorData);
 		double[] peaks = getPeaks(mags);
 		double SD = calculateStandardDeviation(mags);

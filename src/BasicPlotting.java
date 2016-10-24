@@ -22,6 +22,9 @@ public class BasicPlotting {
 		frame.setSize(800, 600);
 		frame.setContentPane(plot);
 		frame.setVisible(true);
+		
+		
+		System.out.println(StepCounter.countSteps(null, data.getColumns(0, 2)));
 	}
 
 	private static void addNoise(double[] sample, int max) {

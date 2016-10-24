@@ -69,4 +69,11 @@ public class StepCounter {
 		}
 		return out;
 	}
+	
+	private static void fixTime(double[][] d){
+		double start = d[0][0];
+		for(int i = 0; i < d.length;i++){
+			d[i][0] = d[i][0] - start;
+		}
+	}
 }

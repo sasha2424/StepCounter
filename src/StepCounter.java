@@ -15,6 +15,7 @@ public class StepCounter {
 		
 		int total = 0;
 		for(int i = 0; i < peaks.length;i++){
+			
 			if(peaks[i] > mean + SD)
 				total++;
 		}
@@ -41,10 +42,10 @@ public class StepCounter {
 		return Math.sqrt(x * x + y * y + z * z);
 	}
 
-	private static double[] calculateMagnitudesFor(double[][] sensorData) {
-		double[] out = new double[sensorData.length];
-		for (int i = 0; i < sensorData.length; i++) {
-			out[i] = calculateMagnitude(sensorData[i][0], sensorData[i][1], sensorData[i][2]);
+	public static double[] calculateMagnitudesFor(double[][] sensorData) {
+		double[] out = new double[sensorData[0].length];
+		for (int i = 0; i < sensorData[0].length; i++) {
+			out[i] = calculateMagnitude(sensorData[0][i], sensorData[1][i], sensorData[2][i]);
 		}
 		return out;
 	}
@@ -67,6 +68,7 @@ public class StepCounter {
 		for (double d : a) {
 			out += d;
 		}
+		out /= a.length;
 		return out;
 	}
 	

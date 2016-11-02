@@ -2,24 +2,24 @@
  * Frank and Sasha
  */
 
-
 import java.util.ArrayList;
 
 public class StepCounter {
 
 	public static int countSteps(double[] times, double[][] sensorData) {
+		sensorData = fixDataByRotation(sensorData);
 		double[] mags = calculateMagnitudesFor(sensorData);
 		double[] peaks = getPeaks(mags);
 		double SD = calculateStandardDeviation(mags);
 		double mean = calculateMean(mags);
-		
+
 		int total = 0;
-		for(int i = 0; i < peaks.length;i++){
-			
-			if(peaks[i] > mean + SD)
+		for (int i = 0; i < peaks.length; i++) {
+
+			if (peaks[i] > mean + SD)
 				total++;
 		}
-		
+
 		return total;
 	}
 
@@ -32,7 +32,7 @@ public class StepCounter {
 			}
 		}
 		double[] o = new double[out.size()];
-		for(int i = 0; i < out.size(); i++){
+		for (int i = 0; i < out.size(); i++) {
 			o[i] = out.get(i);
 		}
 		return o;
@@ -71,11 +71,50 @@ public class StepCounter {
 		out /= a.length;
 		return out;
 	}
-	
-	private static void fixTime(double[][] d){
+
+	private static double[][] fixDataByRotation(double[][] data) {
+		double[][] fixed = new double[data.length][3];
+		for (int i = 0; i < data.length; i++) {
+			double xa = data[i][0];
+			double ya = data[i][1];
+			double za = data[i][2];
+			double xr = data[i][3];
+			double yr = data[i][4];
+			double zr = data[i][5];
+			double X = 0;
+			double Y = 0;
+			double Z = 0;
+			
+			Y = ya * Math.cos(zr) + xa * Math.sin(zr) + ya * Math.cos(xr) + za * Math.sin(xr);
+			X = ya * Math.sin(zr) + xa * Math.cos(zr) + ya * Math.sin(xr) + za * Math.cos(xr);
+			
+			double mag = calculateMagnitude(xa, ya, za);
+			mag = mag * mag;
+			mag -= Y*Y;
+			mag -= X*X;
+			Z = Math.sqrt(mag);
+			
+			fixed[i][0] = X;
+			fixed[i][1] = Y;
+			fixed[i][2] = Z;
+		}
+		return fixed;
+	}
+
+	private static void fixTime(double[][] d) {
 		double start = d[0][0];
-		for(int i = 0; i < d.length;i++){
+		for (int i = 0; i < d.length; i++) {
 			d[i][0] = d[i][0] - start;
 		}
+	}
+	
+	private double[][] getWindow(double[][] d, int row, int radius){
+		
+		return d;
+		
+	}
+	
+	private double[][] getColumn(double[][] d, int row){
+		if(row < 0 || row > d.length - 1);
 	}
 }

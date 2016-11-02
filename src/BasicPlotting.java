@@ -14,10 +14,10 @@ public class BasicPlotting {
 
 		// add a line plot to the PlotPanel
 		for (int i = 0; i < 3; i++) {
-			//plot.addLinePlot("acceleration", data.getColumn(i));
+			plot.addLinePlot("acceleration", data.getColumn(i));
 		}
 		
-		plot.addLinePlot("mags", StepCounter.calculateMagnitudesFor(data.getColumns(0,2)));
+		//plot.addLinePlot("mags", StepCounter.calculateMagnitudesFor(data.getColumns(0,2)));
 		
 		// put the PlotPanel in a JFrame, as a JPanel
 		JFrame frame = new JFrame("Results");

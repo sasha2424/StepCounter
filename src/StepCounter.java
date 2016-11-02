@@ -1,3 +1,4 @@
+
 /***
  * Frank and Sasha
  */
@@ -84,16 +85,16 @@ public class StepCounter {
 			double X = 0;
 			double Y = 0;
 			double Z = 0;
-			
+
 			Y = ya * Math.cos(zr) + xa * Math.sin(zr) + ya * Math.cos(xr) + za * Math.sin(xr);
 			X = ya * Math.sin(zr) + xa * Math.cos(zr) + ya * Math.sin(xr) + za * Math.cos(xr);
-			
+
 			double mag = calculateMagnitude(xa, ya, za);
 			mag = mag * mag;
-			mag -= Y*Y;
-			mag -= X*X;
+			mag -= Y * Y;
+			mag -= X * X;
 			Z = Math.sqrt(mag);
-			
+
 			fixed[i][0] = X;
 			fixed[i][1] = Y;
 			fixed[i][2] = Z;
@@ -107,14 +108,31 @@ public class StepCounter {
 			d[i][0] = d[i][0] - start;
 		}
 	}
-	
-	private double[][] getWindow(double[][] d, int row, int radius){
-		
-		return d;
-		
+
+	private double[][] getWindow(double[][] d, int row, int radius) {
+		ArrayList<double[]> rows = new ArrayList<double[]>();
+		for (int i = row - radius; i < row + radius; i++) {
+			rows.add(getColumn(d, i));
+		}
+
+		for (int i = 0; i < rows.size(); i++) {
+			if (rows.get(i) == null) {
+				rows.remove(i);
+			}
+		}
+
+		double[][] out = new double[rows.size()][rows.get(0).length];
+		for (int i = 0; i < rows.size(); i++) {
+			out[i] = rows.get(i);
+		}
+		return out;
 	}
-	
-	private double[][] getColumn(double[][] d, int row){
-		if(row < 0 || row > d.length - 1);
+
+	private double[] getColumn(double[][] d, int row) {
+		if (row < 0 || row > d.length - 1) {
+			return null;
+		} else {
+			return d[row];
+		}
 	}
 }

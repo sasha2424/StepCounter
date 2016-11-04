@@ -8,27 +8,41 @@ import java.util.ArrayList;
 public class StepCounter {
 
 	public static int countSteps(double[] times, double[][] sensorData) {
-		sensorData = fixDataByRotation(sensorData);
-		double[] mags = calculateMagnitudesFor(sensorData);
-		double[] peaks = getPeaks(mags);
-		double SD = calculateStandardDeviation(mags);
-		double mean = calculateMean(mags);
-
+		sensorData = sensorData;
 		int total = 0;
-		for (int i = 0; i < peaks.length; i++) {
 
-			if (peaks[i] > mean + SD)
+		double[] magnitudes = calculateMagnitudesFor(sensorData);
+		
+		for (int i = 0; i < sensorData.length; i++) {
+			double[] mags = getWindow(magnitudes, i, 300);
+			double SD = calculateStandardDeviation(mags);
+			double mean = calculateMean(mags);
+			
+			
+			if (isPeak(mags, i) && mags[i] > mean + SD * .01) {
 				total++;
+			}
+
 		}
 
 		return total;
+	}
+
+	public static double[][] flipData(double[][] d) {
+		double[][] out = new double[d[0].length][d.length];
+		for (int i = 0; i < d.length; i++) {
+			for (int j = 0; j < d[0].length; j++) {
+				out[j][i] = d[i][j];
+			}
+		}
+		return out;
 	}
 
 	private static double[] getPeaks(double[] a) {
 		ArrayList<Double> out = new ArrayList<Double>();
 
 		for (int i = 1; i < a.length - 1; i++) {
-			if (a[i] > a[i + 1] && a[i] > a[i - 1]) {
+			if (isPeak(a, i)) {
 				out.add(a[i]);
 			}
 		}
@@ -39,14 +53,23 @@ public class StepCounter {
 		return o;
 	}
 
+	private static boolean isPeak(double[] a, int location) {
+		if (location + 1 > a.length - 1 || location - 1 < 0) {
+			return false;
+		} else {
+			return a[location] > a[location + 1] && a[location] > a[location - 1];
+		}
+
+	}
+
 	public static double calculateMagnitude(double x, double y, double z) {
 		return Math.sqrt(x * x + y * y + z * z);
 	}
 
 	public static double[] calculateMagnitudesFor(double[][] sensorData) {
-		double[] out = new double[sensorData[0].length];
-		for (int i = 0; i < sensorData[0].length; i++) {
-			out[i] = calculateMagnitude(sensorData[0][i], sensorData[1][i], sensorData[2][i]);
+		double[] out = new double[sensorData.length];
+		for (int i = 0; i < sensorData.length; i++) {
+			out[i] = calculateMagnitude(sensorData[i][0], sensorData[i][1], sensorData[i][2]);
 		}
 		return out;
 	}
@@ -109,28 +132,29 @@ public class StepCounter {
 		}
 	}
 
-	private double[][] getWindow(double[][] d, int row, int radius) {
-		ArrayList<double[]> rows = new ArrayList<double[]>();
+	private static double[] getWindow(double[] d, int row, int radius) {
+		ArrayList<Double> rows = new ArrayList<Double>();
 		for (int i = row - radius; i < row + radius; i++) {
 			rows.add(getColumn(d, i));
+
 		}
 
 		for (int i = 0; i < rows.size(); i++) {
-			if (rows.get(i) == null) {
+			if (rows.get(i) == 0) {
 				rows.remove(i);
 			}
 		}
 
-		double[][] out = new double[rows.size()][rows.get(0).length];
+		double[] out = new double[rows.size()];
 		for (int i = 0; i < rows.size(); i++) {
 			out[i] = rows.get(i);
 		}
 		return out;
 	}
 
-	private double[] getColumn(double[][] d, int row) {
+	private static double getColumn(double[] d, int row) {
 		if (row < 0 || row > d.length - 1) {
-			return null;
+			return 0;
 		} else {
 			return d[row];
 		}

@@ -7,24 +7,61 @@ import java.util.ArrayList;
 
 public class StepCounter {
 
-	public static int countSteps(double[] times, double[][] sensorData) {
-		sensorData = sensorData;
+	public static final int WINDOWSIZE = 50;
+	public static final double STANDARD_DEVIATION_SCALE = .01;
+
+	public static final int START_WINDOW_SIZE = 9;
+
+	public static final double START_POINT_LIMIT = .4;
+
+	public static final int MIN_ACTIVITY_TIME = 20;
+
+	public static int countStepsOriginal(double[] times, double[][] sensorData) {
 		int total = 0;
 
-		double[] magnitudes = calculateMagnitudesFor(sensorData);
-		
-		for (int i = 0; i < sensorData.length; i++) {
-			double[] mags = getWindow(magnitudes, i, 300);
-			double SD = calculateStandardDeviation(mags);
-			double mean = calculateMean(mags);
-			
-			
-			if (isPeak(mags, i) && mags[i] > mean + SD * .01) {
+		double[] mags = calculateMagnitudesFor(sensorData);
+		double SD = calculateStandardDeviation(mags);
+		double mean = calculateMean(mags);
+
+		for (int i = 0; i < mags.length; i++) {
+
+			if (isPeak(mags, i) && mags[i] > mean + SD * STANDARD_DEVIATION_SCALE) {
 				total++;
 			}
 
 		}
 
+		return total;
+	}
+
+	public static int countSteps(double[] times, double[][] sensorData) {
+		int total = 0;
+
+		double[] magnitudes = calculateMagnitudesFor(sensorData);
+
+		for (int i = 0; i < magnitudes.length; i++) {
+			double[] mags = getWindow(magnitudes, i, WINDOWSIZE);
+			double SD = calculateStandardDeviation(mags);
+			double mean = calculateMean(mags);
+
+			if (isPeak(mags, i) && mags[i] > mean + SD * STANDARD_DEVIATION_SCALE) {
+				total++;
+			}
+
+		}
+
+		return total;
+	}
+
+	public static int countStepsCon(double[] times, double[][] sensorData) {
+		int total = 0;
+		double[] mags = calculateMagnitudesFor(sensorData);
+
+		for (int i = 0; i < mags.length; i++) {
+			if (isPeak(mags, i) && mags[i] > 0) {
+				total++;
+			}
+		}
 		return total;
 	}
 
@@ -62,14 +99,14 @@ public class StepCounter {
 
 	}
 
-	public static double calculateMagnitude(double x, double y, double z) {
+	private static double calculateMagnitude(double x, double y, double z) {
 		return Math.sqrt(x * x + y * y + z * z);
 	}
 
 	public static double[] calculateMagnitudesFor(double[][] sensorData) {
-		double[] out = new double[sensorData.length];
-		for (int i = 0; i < sensorData.length; i++) {
-			out[i] = calculateMagnitude(sensorData[i][0], sensorData[i][1], sensorData[i][2]);
+		double[] out = new double[sensorData[0].length];
+		for (int i = 0; i < sensorData[0].length; i++) {
+			out[i] = calculateMagnitude(sensorData[0][i], sensorData[1][i], sensorData[2][i]);
 		}
 		return out;
 	}
@@ -94,42 +131,6 @@ public class StepCounter {
 		}
 		out /= a.length;
 		return out;
-	}
-
-	private static double[][] fixDataByRotation(double[][] data) {
-		double[][] fixed = new double[data.length][3];
-		for (int i = 0; i < data.length; i++) {
-			double xa = data[i][0];
-			double ya = data[i][1];
-			double za = data[i][2];
-			double xr = data[i][3];
-			double yr = data[i][4];
-			double zr = data[i][5];
-			double X = 0;
-			double Y = 0;
-			double Z = 0;
-
-			Y = ya * Math.cos(zr) + xa * Math.sin(zr) + ya * Math.cos(xr) + za * Math.sin(xr);
-			X = ya * Math.sin(zr) + xa * Math.cos(zr) + ya * Math.sin(xr) + za * Math.cos(xr);
-
-			double mag = calculateMagnitude(xa, ya, za);
-			mag = mag * mag;
-			mag -= Y * Y;
-			mag -= X * X;
-			Z = Math.sqrt(mag);
-
-			fixed[i][0] = X;
-			fixed[i][1] = Y;
-			fixed[i][2] = Z;
-		}
-		return fixed;
-	}
-
-	private static void fixTime(double[][] d) {
-		double start = d[0][0];
-		for (int i = 0; i < d.length; i++) {
-			d[i][0] = d[i][0] - start;
-		}
 	}
 
 	private static double[] getWindow(double[] d, int row, int radius) {
